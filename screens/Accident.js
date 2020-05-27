@@ -26,11 +26,18 @@ export default class Accident extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      accident: 0,
+      accident: -1,
       flag: false,
       flag2: false,
-      accidentDate: new Date(),
-      anotherParty: 0,
+      accidentDate: "",
+      accidentPlace: "",
+      accidentReason: "",
+      anotherParty: -1,
+      defaulterName: "",
+      insuranceCompany: "",
+      solictorExpense: -1,
+      personalBoard: -1,
+      solictorName: "",
     };
   }
 
@@ -54,9 +61,73 @@ export default class Accident extends Component {
       this.setState({ flag2: false });
     }
   }
-
+  componentDidMount() {
+    console.log(this.props.route.params.item);
+  }
   handleNext() {
-    this.props.navigation.navigate("Declartion");
+    const {
+      accident,
+      accidentDate,
+      accidentPlace,
+      accidentReason,
+      anotherParty,
+      defaulterName,
+      insuranceCompany,
+      solictorExpense,
+      personalBoard,
+      solictorName,
+    } = this.state;
+    const item = {
+      ...this.props.route.params.item,
+      accident,
+      accidentDate,
+      accidentPlace,
+      accidentReason,
+      anotherParty,
+      defaulterName,
+      insuranceCompany,
+      solictorExpense,
+      solictorName,
+      personalBoard,
+    };
+    if (accident !== -1) {
+      if (accident === 0) {
+        this.props.navigation.navigate("Declartion", { item: item });
+      } else {
+        if (
+          accidentDate === "" ||
+          accidentPlace === "" ||
+          accidentReason === ""
+        ) {
+          alert("Field is required");
+        } else {
+          if (anotherParty === -1) {
+            alert("Field is required");
+          } else {
+            if (anotherParty === 1) {
+              if (
+                defaulterName === "" ||
+                insuranceCompany === "" ||
+                solictorExpense === -1 ||
+                personalBoard === -1 ||
+                solictorName === -1
+              ) {
+                alert("Field is required");
+              } else {
+                this.props.navigation.navigate("Declartion", { item: item });
+              }
+            } else {
+              this.props.navigation.navigate("Declartion", { item: item });
+            }
+          }
+        }
+      }
+    } else {
+      alert("Field is required");
+    }
+
+    // this.props.route.params.item;
+    // this.props.navigation.navigate("Declartion");
   }
   render() {
     return (
@@ -87,6 +158,7 @@ export default class Accident extends Component {
                   initial={-1}
                   buttonSize={20}
                   buttonOuter
+                  animation={false}
                   radio_props={radio_props}
                   onPress={this.handleAccidentToggle.bind(this)}
                 />
@@ -117,14 +189,16 @@ export default class Accident extends Component {
                     minimumDate={new Date(2000, 1, 1)}
                     maximumDate={new Date()}
                     locale={"en"}
-                    timeZoneOffsetInMinutes={undefined}
+                    timeZoneOffsetInMinutes={""}
                     modalTransparent={false}
                     animationType={"fade"}
                     androidMode={"default"}
                     placeHolderText="select"
                     textStyle={{ color: "green", fontSize: 18 }}
                     placeHolderTextStyle={{ color: "#d3d3d3" }}
-                    //   onDateChange={this.doctor_date.bind(this)}
+                    onDateChange={(e) => {
+                      this.setState({ accidentDate: e });
+                    }}
                     disabled={false}
                     formatChosenDate={(date) => {
                       return moment(date).format("DD-MM-YYYY");
@@ -139,10 +213,10 @@ export default class Accident extends Component {
 
                     <Input
                       style={{ paddingLeft: 12 }}
-                      // value={this.state.name_of_doctor}
-                      // onChangeText={(e) => {
-                      //   this.setState({ name_of_doctor: e });
-                      // }}
+                      value={this.state.accidentPlace}
+                      onChangeText={(e) => {
+                        this.setState({ accidentPlace: e });
+                      }}
                     />
                   </Item>
                   <Item floatingLabel style={{ marginTop: 10 }}>
@@ -152,10 +226,10 @@ export default class Accident extends Component {
 
                     <Input
                       style={{ paddingLeft: 12 }}
-                      // value={this.state.name_of_doctor}
-                      // onChangeText={(e) => {
-                      //   this.setState({ name_of_doctor: e });
-                      // }}
+                      value={this.state.accidentReason}
+                      onChangeText={(e) => {
+                        this.setState({ accidentReason: e });
+                      }}
                     />
                   </Item>
                 </View>
@@ -181,7 +255,9 @@ export default class Accident extends Component {
                       buttonSize={20}
                       buttonOuter
                       radio_props={radio_props}
-                      onPress={this.handleAnotherParty.bind(this)}
+                      onPress={(e) => {
+                        this.setState({ anotherParty: e, flag2: e });
+                      }}
                     />
                   </View>
                 </View>
@@ -200,7 +276,13 @@ export default class Accident extends Component {
                       </Label>
 
                       <Item regular style={{ margin: 3 }}>
-                        <Input style={{ margin: 3 }} />
+                        <Input
+                          style={{ margin: 3 }}
+                          value={this.state.defaulterName}
+                          onChangeText={(e) => {
+                            this.setState({ defaulterName: e });
+                          }}
+                        />
                       </Item>
                       <Label
                         style={{
@@ -213,7 +295,13 @@ export default class Accident extends Component {
                       </Label>
 
                       <Item regular style={{ margin: 3 }}>
-                        <Input style={{ margin: 3 }} />
+                        <Input
+                          style={{ margin: 3 }}
+                          value={this.state.insuranceCompany}
+                          onChangeText={(e) => {
+                            this.setState({ insuranceCompany: e });
+                          }}
+                        />
                       </Item>
                     </View>
                     <View style={[styles.Header]}>
@@ -237,8 +325,11 @@ export default class Accident extends Component {
                           initial={-1}
                           buttonSize={20}
                           buttonOuter
+                          animation={false}
                           radio_props={radio_props}
-                          onPress={this.handleAnotherParty.bind(this)}
+                          onPress={(e) => {
+                            this.setState({ solictorExpense: e });
+                          }}
                         />
                       </View>
                     </View>
@@ -264,7 +355,9 @@ export default class Accident extends Component {
                           buttonSize={20}
                           buttonOuter
                           radio_props={radio_props}
-                          onPress={this.handleAnotherParty.bind(this)}
+                          onPress={(e) => {
+                            this.setState({ personalBoard: e });
+                          }}
                         />
                       </View>
                       <Label
@@ -278,7 +371,13 @@ export default class Accident extends Component {
                       </Label>
 
                       <Item regular style={{ margin: 3 }}>
-                        <Input style={{ margin: 3 }} />
+                        <Input
+                          style={{ margin: 3 }}
+                          value={this.state.solictorName}
+                          onChangeText={(e) => {
+                            this.setState({ solictorName: e });
+                          }}
+                        />
                       </Item>
                     </View>
                   </View>

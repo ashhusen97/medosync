@@ -6,8 +6,9 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  AsyncStorage,
 } from "react-native";
-import RadioForm from "react-native-simple-radio-button";
+
 import {
   DatePicker,
   Item,
@@ -21,24 +22,22 @@ import {
 } from "native-base";
 import moment from "moment";
 import SmoothPinCodeInput from "react-native-smooth-pincode-input";
+import RadioForm from "react-native-simple-radio-button";
 var radio_props = [
   { label: "No", value: 0 },
   { label: "Yes", value: 1 },
 ];
-
-export default class Home extends Component {
+export default class home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      //covid
-      fever: undefined,
-      cough: undefined,
-      breath_short: undefined,
-      sore_throat: undefined,
-      confirmed: undefined,
-      travel: undefined,
-      healthcare: undefined,
-
+      fever: -1,
+      cough: -1,
+      breath_short: -1,
+      sore_throat: -1,
+      confirmed: -1,
+      travel: -1,
+      healthcare: -1,
       private: false,
       chosenDate: new Date(),
 
@@ -61,38 +60,6 @@ export default class Home extends Component {
       doctor_address: undefined,
     };
   }
-  onValueChange(value) {
-    this.setState({
-      selected: value,
-    });
-  }
-  handleTitle(value) {
-    this.setState({
-      title: value,
-    });
-  }
-  setDate(newDate) {
-    this.setState({ chosenDate: newDate });
-  }
-  handleDOB(newDate) {
-    this.setState({ dob: newDate });
-  }
-  handleFirstSymtomps(newDate) {
-    this.setState({ first_symtomps: newDate });
-  }
-  handleFirstConsults(newDate) {
-    this.setState({ first_consult: newDate });
-  }
-  handleDOB(newDate) {
-    this.setState({ dob: newDate });
-  }
-  handleRelated(value) {}
-  handleRelatedDate(value) {
-    this.setState({ related_date: value });
-  }
-  doctor_date(value) {
-    this.setState({ doctor_date: value });
-  }
   handlePrivate(value) {
     this.setState({ private_patient: value });
     if (value === 0) {
@@ -100,41 +67,6 @@ export default class Home extends Component {
         "Your insurance company will not be charged, you will be charged the full price of the treatment because you did not elect to be private"
       );
     }
-  }
-  handleFever(value) {
-    this.setState({
-      fever: value,
-    });
-  }
-  handleCough(value) {
-    this.setState({
-      cough: value,
-    });
-  }
-  handleBreathShort(value) {
-    this.setState({
-      breath_short: value,
-    });
-  }
-  handleSoreThroat(value) {
-    this.setState({
-      sore_throat: value,
-    });
-  }
-  handleConfirmed(value) {
-    this.setState({
-      confirmed: value,
-    });
-  }
-  handleTravel(value) {
-    this.setState({
-      travel: value,
-    });
-  }
-  handleHealthCare(value) {
-    this.setState({
-      healthcare: value,
-    });
   }
   handlePrevious(value) {
     this.setState({ related: value });
@@ -148,65 +80,110 @@ export default class Home extends Component {
       });
     }
   }
-  handlePhone(value) {
-    let reg = /^(0|08|08[0-9]{1,9})$/;
-    if (reg.test(value)) {
-      this.setState({ phone_number: value });
+  handleNext() {
+    const {
+      fever,
+      cough,
+      membership,
+      breath_short,
+      sore_throat,
+      confirmed,
+      travel,
+      healthcare,
+      selected,
+      title,
+      forename,
+      surname,
+      dob,
+      address,
+      phone_number,
+      private_patient,
+      first_symtomps,
+      first_consult,
+      related,
+      name_of_doctor,
+      doctor_date,
+      doctor_address,
+    } = this.state;
+    const item = {
+      fever,
+      cough,
+      breath_short,
+      sore_throat,
+      confirmed,
+      travel,
+      healthcare,
+      selected,
+      membership,
+      title,
+      forename,
+      surname,
+      dob,
+      address,
+      phone_number,
+      private_patient,
+      first_symtomps,
+      first_consult,
+      related,
+      name_of_doctor,
+      doctor_date,
+      doctor_address,
+    };
+    if (
+      fever !== -1
+      // cough !== -1 &&
+      // breath_short !== -1 &&
+      // sore_throat !== -1 &&
+      // confirmed !== -1 &&
+      // travel !== -1 &&
+      // healthcare !== -1 &&
+      // selected !== undefined &&
+      // title !== undefined &&
+      // forename !== undefined &&
+      // surname !== undefined &&
+      // dob !== undefined &&
+      // address !== undefined &&
+      // phone_number !== undefined &&
+      // private_patient !== undefined &&
+      // first_symtomps !== undefined
+    ) {
+      this.props.navigation.navigate("Accident", {
+        item: item,
+      });
+    } else {
+      alert("All fields required");
+    }
+    AsyncStorage.setItem("homeValues", JSON.stringify(item));
+  }
+  componentDidMount() {
+    if (AsyncStorage.getItem("homeValues")) {
+      AsyncStorage.getItem("homeValues").then((item) => {
+        this.setState({
+          fever: JSON.parse(item).fever,
+          cough: JSON.parse(item).cough,
+          breath_short: JSON.parse(item).breath_short,
+          sore_throat: JSON.parse(item).sore_throat,
+          confirmed: JSON.parse(item).confirmed,
+          travel: JSON.parse(item).travel,
+          healthcare: JSON.parse(item).healthcare,
+          membership: JSON.parse(item).membership,
+          title: JSON.parse(item).title,
+          forename: JSON.parse(item).forename,
+          surname: JSON.parse(item).surname,
+          dob: JSON.parse(item).dob,
+          address: JSON.parse(item).address,
+          phone_number: JSON.parse(item).phone_number,
+          private_patient: JSON.parse(item).private_patient,
+          first_symtomps: JSON.parse(item).first_symtomps,
+          related: JSON.parse(item).related,
+          related_date: JSON.parse(item).related_date,
+          name_of_doctor: JSON.parse(item).name_of_doctor,
+          doctor_date: JSON.parse(item).doctor_date,
+          doctor_address: JSON.parse(item).doctor_address,
+        });
+      });
     }
   }
-
-  //   handle next
-
-  handleNext() {
-    // const {
-    //   fever,
-    //   cough,
-    //   breath_short,
-    //   sore_throat,
-    //   confirmed,
-    //   travel,
-    //   healthcare,
-    //   selected,
-    //   title,
-    //   forename,
-    //   surname,
-    //   dob,
-    //   address,
-    //   phone_number,
-    //   private_patient,
-    //   first_symtomps,
-    //   first_consult,
-    //   related,
-    //   name_of_doctor,
-    //   doctor_date,
-    //   doctor_address,
-    // } = this.state;
-    // if (
-    //   fever !== undefined &&
-    //   cough !== undefined &&
-    //   breath_short !== undefined &&
-    //   sore_throat !== undefined &&
-    //   confirmed !== undefined &&
-    //   travel !== undefined &&
-    //   healthcare !== undefined &&
-    //   selected !== undefined &&
-    //   title !== undefined &&
-    //   forename !== undefined &&
-    //   surname !== undefined &&
-    //   dob !== undefined &&
-    //   address !== undefined &&
-    //   phone_number !== undefined &&
-    //   private_patient !== undefined &&
-    //   first_symtomps !== undefined &&
-    //   first_consult !== undefined
-    // ) {
-    //   this.props.navigation.navigate("Accident");
-    // } else {
-    //   alert("All fields required");
-    // }
-    this.props.navigation.navigate("Accident");
-  }
-
   render() {
     return (
       <KeyboardAvoidingView
@@ -214,8 +191,6 @@ export default class Home extends Component {
         behavior={Platform.OS == "ios" ? "padding" : "height"}
       >
         <ScrollView contentContainerStyle={styles.Container}>
-          {/* section 1 */}
-
           <View style={{ marginBottom: 10 }}>
             <View style={styles.Header}>
               <Text style={styles.CoronaHeading}>
@@ -245,11 +220,14 @@ export default class Home extends Component {
                   labelHorizontal={false}
                   formHorizontal={true}
                   style={{ margin: 10 }}
-                  initial={2}
+                  initial={this.state.fever}
                   buttonSize={20}
                   buttonOuter
+                  animation={false}
                   radio_props={radio_props}
-                  onPress={this.handleFever.bind(this)}
+                  onPress={(e) => {
+                    this.setState({ fever: e });
+                  }}
                 />
               </View>
               <View
@@ -278,8 +256,11 @@ export default class Home extends Component {
                   initial={2}
                   buttonSize={20}
                   buttonOuter
+                  animation={false}
                   radio_props={radio_props}
-                  onPress={this.handleCough.bind(this)}
+                  onPress={(e) => {
+                    this.setState({ cough: e });
+                  }}
                 />
               </View>
               <View
@@ -308,8 +289,11 @@ export default class Home extends Component {
                   initial={2}
                   buttonSize={20}
                   buttonOuter
+                  animation={false}
                   radio_props={radio_props}
-                  onPress={this.handleBreathShort.bind(this)}
+                  onPress={(e) => {
+                    this.setState({ breath_short: e });
+                  }}
                 />
               </View>
               <View
@@ -339,8 +323,11 @@ export default class Home extends Component {
                   initial={2}
                   buttonSize={20}
                   buttonOuter
+                  animation={false}
                   radio_props={radio_props}
-                  onPress={this.handleSoreThroat.bind(this)}
+                  onPress={(e) => {
+                    this.setState({ sore_throat: e });
+                  }}
                 />
               </View>
               <View
@@ -370,8 +357,11 @@ export default class Home extends Component {
                   initial={2}
                   buttonSize={20}
                   buttonOuter
+                  animation={false}
                   radio_props={radio_props}
-                  onPress={this.handleConfirmed.bind(this)}
+                  onPress={(e) => {
+                    this.setState({ confirmed: e });
+                  }}
                 />
               </View>
               <View
@@ -400,8 +390,11 @@ export default class Home extends Component {
                   initial={2}
                   buttonSize={20}
                   buttonOuter
+                  animation={false}
                   radio_props={radio_props}
-                  onPress={this.handleTravel.bind(this)}
+                  onPress={(e) => {
+                    this.setState({ travel: e });
+                  }}
                 />
               </View>
               <View
@@ -431,13 +424,19 @@ export default class Home extends Component {
                   initial={2}
                   buttonSize={20}
                   buttonOuter
+                  animation={false}
                   radio_props={radio_props}
-                  onPress={this.handleHealthCare.bind(this)}
+                  onPress={(e) => {
+                    this.setState({ healthcare: e });
+                  }}
                 />
               </View>
             </View>
           </View>
 
+          {/* corona section end */}
+
+          {/* section 1 start */}
           <View
             style={{
               borderColor: "skyblue",
@@ -491,7 +490,9 @@ export default class Home extends Component {
                 placeholderIconColor="#007aff"
                 style={{ width: undefined, marginTop: 10 }}
                 selectedValue={this.state.selected}
-                onValueChange={this.onValueChange.bind(this)}
+                onValueChange={(e) => {
+                  this.setState({ selected: e });
+                }}
               >
                 <Picker.Item label="Laya - Dublin" value="Dublin" />
                 <Picker.Item label="Laya - Galway" value="Galway" />
@@ -515,7 +516,9 @@ export default class Home extends Component {
                   placeholderIconColor="#007aff"
                   style={{ width: undefined, marginTop: 10 }}
                   selectedValue={this.state.title}
-                  onValueChange={this.handleTitle.bind(this)}
+                  onValueChange={(e) => {
+                    this.setState({ title: e });
+                  }}
                 >
                   <Picker.Item label="Mr." value="Mr" />
                   <Picker.Item label="Ms." value="Ms" />
@@ -566,7 +569,9 @@ export default class Home extends Component {
                   placeHolderText="select"
                   textStyle={{ color: "green" }}
                   placeHolderTextStyle={{ color: "#d3d3d3" }}
-                  onDateChange={this.handleDOB.bind(this)}
+                  onDateChange={(e) => {
+                    this.setState({ dob: e });
+                  }}
                   disabled={false}
                   formatChosenDate={(date) => {
                     return moment(date).format("DD-MM-YYYY");
@@ -602,6 +607,8 @@ export default class Home extends Component {
               </Item>
             </View>
           </View>
+          {/* section 1 end */}
+          {/* private section start */}
           <View
             style={[
               styles.Header,
@@ -628,11 +635,14 @@ export default class Home extends Component {
               initial={2}
               buttonSize={20}
               buttonOuter
+              animation={false}
               radio_props={radio_props}
-              onPress={this.handlePrivate.bind(this)}
+              onPress={(e) => this.handlePrivate(e)}
             />
           </View>
 
+          {/* private section end  */}
+          {/* section 2 start */}
           <View
             style={{
               borderColor: "skyblue",
@@ -661,7 +671,9 @@ export default class Home extends Component {
                 placeHolderText="select"
                 textStyle={{ color: "green", fontSize: 18 }}
                 placeHolderTextStyle={{ color: "#d3d3d3" }}
-                onDateChange={this.handleFirstSymtomps.bind(this)}
+                onDateChange={(e) => {
+                  this.setState({ first_symtomps: e });
+                }}
                 disabled={false}
                 formatChosenDate={(date) => {
                   return moment(date).format("DD-MM-YYYY");
@@ -675,7 +687,7 @@ export default class Home extends Component {
               </Label>
               <DatePicker
                 defaultDate={new Date()}
-                minimumDate={new Date(new Date(2000, 1, 1))}
+                minimumDate={new Date(2000, 1, 1)}
                 maximumDate={new Date()}
                 locale={"en"}
                 timeZoneOffsetInMinutes={undefined}
@@ -685,7 +697,9 @@ export default class Home extends Component {
                 placeHolderText="select"
                 textStyle={{ color: "green", fontSize: 18 }}
                 placeHolderTextStyle={{ color: "#d3d3d3" }}
-                onDateChange={this.handleFirstConsults.bind(this)}
+                onDateChange={(e) => {
+                  this.setState({ first_consult: e });
+                }}
                 disabled={false}
                 formatChosenDate={(date) => {
                   return moment(date).format("DD-MM-YYYY");
@@ -714,8 +728,9 @@ export default class Home extends Component {
                   initial={2}
                   buttonSize={20}
                   buttonOuter
+                  animation={false}
                   radio_props={radio_props}
-                  onPress={this.handlePrevious.bind(this)}
+                  onPress={(e) => this.handlePrevious(e)}
                 />
               </View>
               <Label style={{ marginHorizontal: 13, fontSize: 16 }}>
@@ -733,7 +748,9 @@ export default class Home extends Component {
                 placeHolderText="select"
                 textStyle={{ color: "green", fontSize: 18 }}
                 placeHolderTextStyle={{ color: "#d3d3d3" }}
-                onDateChange={this.handleRelatedDate.bind(this)}
+                onDateChange={(e) => {
+                  this.setState({ related_date: e });
+                }}
                 disabled={false}
                 formatChosenDate={(date) => {
                   return moment(date).format("DD-MM-YYYY");
@@ -741,6 +758,10 @@ export default class Home extends Component {
               />
             </View>
           </View>
+          {/*section 2 end  */}
+
+          {/* section 3 start */}
+
           {this.state.showReferal ? (
             <View
               style={{
@@ -784,7 +805,9 @@ export default class Home extends Component {
                   placeHolderText="select"
                   textStyle={{ color: "green", fontSize: 18 }}
                   placeHolderTextStyle={{ color: "#d3d3d3" }}
-                  onDateChange={this.doctor_date.bind(this)}
+                  onDateChange={(e) => {
+                    this.setState({ doctor_date: e });
+                  }}
                   disabled={false}
                   formatChosenDate={(date) => {
                     return moment(date).format("DD-MM-YYYY");
@@ -804,32 +827,35 @@ export default class Home extends Component {
               </View>
             </View>
           ) : null}
-          <View style={styles.Header}>
-            <Item style={{ borderBottomColor: "white" }}>
-              <Right>
-                <Button
+
+          {/* section 3 end  */}
+
+          {/* next button */}
+
+          <Item style={{ borderBottomColor: "white", marginVertical: 10 }}>
+            <Right>
+              <Button
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 20,
+                }}
+                primary
+                onPress={() => this.handleNext()}
+              >
+                <Text
                   style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: 20,
+                    color: "white",
+                    fontSize: 20,
+                    textAlign: "center",
                   }}
-                  primary
-                  onPress={() => this.handleNext()}
                 >
-                  <Text
-                    style={{
-                      color: "white",
-                      fontSize: 20,
-                      textAlign: "center",
-                    }}
-                  >
-                    Next
-                  </Text>
-                  <Icon name="send" />
-                </Button>
-              </Right>
-            </Item>
-          </View>
+                  Next
+                </Text>
+                <Icon name="send" />
+              </Button>
+            </Right>
+          </Item>
         </ScrollView>
       </KeyboardAvoidingView>
     );

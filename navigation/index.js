@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Home from "../screens/home";
 import Accident from "../screens/Accident";
 import Declartion from "../screens/Declartion";
+import Verification from "../screens/Verficiation";
 export default class Navigation extends Component {
   render() {
     const Stack = createStackNavigator();
@@ -47,6 +48,23 @@ export default class Navigation extends Component {
           <Stack.Screen
             name="Declartion"
             component={Declartion}
+            options={{
+              headerTintColor: "skyblue",
+              headerTitle: (
+                <Image
+                  style={{ width: 120, height: 40 }}
+                  source={{
+                    uri:
+                      "https://www.medosync.com/wp-content/uploads/2019/11/MedoSync_logo_final_hor.png",
+                  }}
+                />
+              ),
+            }}
+          />
+
+          <Stack.Screen
+            name="Verification"
+            component={Verification}
             options={{
               headerTintColor: "skyblue",
               headerTitle: (

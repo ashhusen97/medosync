@@ -19,11 +19,16 @@ import SignaturePad from "react-native-signature-pad";
 
 export default class Declartion extends Component {
   state = {
-    checked: false,
+    checked1: false,
+    checked2: false,
+    checked3: false,
     show: true,
-    drawing: undefined,
+    drawing: "",
   };
 
+  componentDidMount() {
+    console.log(this.props.route.params.item);
+  }
   _signaturePadError = (error) => {
     console.error(error);
   };
@@ -32,16 +37,25 @@ export default class Declartion extends Component {
     this.setState({
       drawing: base64DataUrl,
     });
-    console.log("Got new signature: " + base64DataUrl);
   };
   clear() {
-    this.setState({ show: false, drawing: undefined });
+    this.setState({ show: false, drawing: "" });
     setTimeout(() => {
       this.setState({ show: true });
     }, 0);
   }
   handleNext() {
-    console.log(this.state.drawing);
+    const { checked1, checked2, checked3, drawing } = this.state;
+    if (!checked1 && !checked2 && !checked3) {
+      alert("You must agree with all the terms");
+      return;
+    }
+    if (drawing == "") {
+      alert("Signature required");
+      return;
+    }
+    const item = { ...this.props.route.params.item, drawing };
+    this.props.navigation.navigate("Verification", { item: item });
   }
   render() {
     return (
@@ -98,11 +112,11 @@ export default class Declartion extends Component {
                 }}
               >
                 <CheckBox
-                  checked={this.state.checked}
+                  checked={this.state.checked1}
                   style={{ marginRight: 20 }}
                   onPress={() => {
                     this.setState({
-                      checked: !this.state.checked,
+                      checked1: !this.state.checked1,
                     });
                   }}
                 />
@@ -160,11 +174,11 @@ export default class Declartion extends Component {
                 }}
               >
                 <CheckBox
-                  checked={this.state.checked}
+                  checked={this.state.checked2}
                   style={{ marginRight: 20 }}
                   onPress={() => {
                     this.setState({
-                      checked: !this.state.checked,
+                      checked2: !this.state.checked2,
                     });
                   }}
                 />
@@ -232,11 +246,11 @@ export default class Declartion extends Component {
                 }}
               >
                 <CheckBox
-                  checked={this.state.checked}
+                  checked={this.state.checked3}
                   style={{ marginRight: 20 }}
                   onPress={() => {
                     this.setState({
-                      checked: !this.state.checked,
+                      checked3: !this.state.checked3,
                     });
                   }}
                 />
